@@ -4,13 +4,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayCircle
 import androidx.compose.material3.Icon
@@ -35,6 +34,8 @@ private enum class GalleryTab(val label: String) {
     PHOTOS("Fotos"),
     VIDEOS("Vídeos")
 }
+
+private const val GALLERY_COLUMNS = 2
 
 @Composable
 fun GallerySection(gallery: GalleryContent, modifier: Modifier = Modifier) {
@@ -75,35 +76,48 @@ fun GallerySection(gallery: GalleryContent, modifier: Modifier = Modifier) {
     }
 }
 
+/**
+ * Cuadrícula "plana" (sin scroll propio): esta sección ya vive dentro del
+ * LazyColumn de la pantalla principal, así que anidar aquí un
+ * LazyVerticalGrid (que también es scrollable) provoca un
+ * IllegalStateException por restricciones de altura infinita. Al ser
+ * listas de contenido acotadas (fotos/vídeos de la galería), basta con
+ * repartirlas en filas normales.
+ */
 @Composable
 private fun PhotoGrid(photos: List<GalleryPhoto>) {
     if (photos.isEmpty()) {
         EmptyGalleryMessage("Todavía no se han añadido fotos a la galería.")
         return
     }
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 12.dp, vertical = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(photos) { photo ->
-            Column {
-                AssetOrPlaceholderImage(
-                    drawableName = photo.drawable,
-                    contentDescription = photo.caption,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(1f)
-                )
-                Text(
-                    text = photo.caption,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = 4.dp, bottom = 4.dp)
-                )
+        photos.chunked(GALLERY_COLUMNS).forEach { rowPhotos ->
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                rowPhotos.forEach { photo ->
+                    Column(modifier = Modifier.weight(1f)) {
+                        AssetOrPlaceholderImage(
+                            drawableName = photo.drawable,
+                            contentDescription = photo.caption,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .aspectRatio(1f)
+                        )
+                        Text(
+                            text = photo.caption,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(top = 4.dp, bottom = 4.dp)
+                        )
+                    }
+                }
+                repeat(GALLERY_COLUMNS - rowPhotos.size) {
+                    Spacer(modifier = Modifier.weight(1f))
+                }
             }
         }
     }
@@ -115,41 +129,50 @@ private fun VideoGrid(videos: List<GalleryVideo>, onVideoClick: (GalleryVideo) -
         EmptyGalleryMessage("Todavía no se han añadido vídeos a la galería.")
         return
     }
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 12.dp, vertical = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(videos) { video ->
-            Column(modifier = Modifier.clickable { onVideoClick(video) }) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(1f)
-                ) {
-                    AssetOrPlaceholderImage(
-                        drawableName = video.thumbnailDrawable,
-                        contentDescription = video.caption,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                    Icon(
-                        imageVector = Icons.Default.PlayCircle,
-                        contentDescription = "Reproducir vídeo",
-                        tint = Color.White,
+        videos.chunked(GALLERY_COLUMNS).forEach { rowVideos ->
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                rowVideos.forEach { video ->
+                    Column(
                         modifier = Modifier
-                            .align(Alignment.Center)
-                            .padding(8.dp)
-                    )
+                            .weight(1f)
+                            .clickable { onVideoClick(video) }
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .aspectRatio(1f)
+                        ) {
+                            AssetOrPlaceholderImage(
+                                drawableName = video.thumbnailDrawable,
+                                contentDescription = video.caption,
+                                modifier = Modifier.fillMaxSize()
+                            )
+                            Icon(
+                                imageVector = Icons.Default.PlayCircle,
+                                contentDescription = "Reproducir vídeo",
+                                tint = Color.White,
+                                modifier = Modifier
+                                    .align(Alignment.Center)
+                                    .padding(8.dp)
+                            )
+                        }
+                        Text(
+                            text = video.caption,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(top = 4.dp, bottom = 4.dp)
+                        )
+                    }
                 }
-                Text(
-                    text = video.caption,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = 4.dp, bottom = 4.dp)
-                )
+                repeat(GALLERY_COLUMNS - rowVideos.size) {
+                    Spacer(modifier = Modifier.weight(1f))
+                }
             }
         }
     }
