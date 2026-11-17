@@ -1,0 +1,53 @@
+{
+  "intro": {
+    "videoAsset": "intro.mp4"
+  },
+  "presentation": {
+    "name": "Titanium",
+    "description": "Asociación cultural dedicada al punk, el rock y el metal. Organizamos conciertos, apoyamos a grupos locales y creamos un espacio para la escena independiente.",
+    "location": "Madrid, España"
+  },
+  "events": [
+    {
+      "id": "ejemplo-1",
+      "day": "14",
+      "month": "DIC",
+      "bandName": "Nombre del grupo (ejemplo)",
+      "musicDescription": "Breve descripción del estilo musical del grupo: por ejemplo, punk rock rápido y directo con letras reivindicativas.",
+      "logoDrawable": "logo_grupo_ejemplo",
+      "socialUrl": "https://www.instagram.com/"
+    },
+    {
+      "id": "ejemplo-2",
+      "day": "21",
+      "month": "DIC",
+      "bandName": "Otro grupo (ejemplo)",
+      "musicDescription": "Metal de raíces clásicas con influencias thrash.",
+      "logoDrawable": "logo_grupo_ejemplo_2",
+      "socialUrl": null
+    }
+  ],
+  "venue": {
+    "images": [
+      { "drawable": "sede_ejemplo_1", "caption": "Sala principal del local." },
+      { "drawable": "sede_ejemplo_2", "caption": "Zona de barra y escenario." }
+    ]
+  },
+  "gallery": {
+    "photos": [
+      { "drawable": "galeria_foto_ejemplo_1", "caption": "Concierto de ejemplo, marzo 2025." }
+    ],
+    "videos": [
+      {
+        "videoAsset": "galeria_ejemplo.mp4",
+        "thumbnailDrawable": "galeria_video_ejemplo_1",
+        "caption": "Resumen del concierto de ejemplo."
+      }
+    ]
+  },
+  "membership": {
+    "intro": "¿Quieres formar parte de Titanium? Hazte socio y apoya la escena punk, rock y metal local. Escríbenos por WhatsApp y te contamos cómo unirte.",
+    "whatsappNumber": "34600000000",
+    "whatsappMessage": "Hola, quiero información para hacerme socio de Titanium"
+  }
+}
