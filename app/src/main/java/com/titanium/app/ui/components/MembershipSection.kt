@@ -18,11 +18,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
-import com.titanium.app.data.MembershipContent
+import com.titanium.app.data.firebase.MembershipInfo
 import java.net.URLEncoder
 
 @Composable
-fun MembershipSection(membership: MembershipContent, modifier: Modifier = Modifier) {
+fun MembershipSection(membership: MembershipInfo, modifier: Modifier = Modifier) {
     val context = LocalContext.current
 
     Column(modifier = modifier) {

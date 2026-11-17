@@ -1,5 +1,6 @@
 package com.titanium.app.ui.components
 
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,11 +16,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
-import com.titanium.app.data.PresentationContent
+import com.titanium.app.data.firebase.PresentationInfo
 
+/**
+ * [onAdminAccessRequested] se dispara al mantener pulsado el nombre de la
+ * asociación: es el punto de entrada (escondido para el público) al login
+ * de administradores.
+ */
 @Composable
-fun HeaderCard(presentation: PresentationContent, modifier: Modifier = Modifier) {
+fun HeaderCard(
+    presentation: PresentationInfo,
+    onAdminAccessRequested: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -30,7 +41,10 @@ fun HeaderCard(presentation: PresentationContent, modifier: Modifier = Modifier)
             Text(
                 text = presentation.name.uppercase(),
                 style = MaterialTheme.typography.displayLarge,
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.pointerInput(Unit) {
+                    detectTapGestures(onLongPress = { onAdminAccessRequested() })
+                }
             )
             Text(
                 text = presentation.description,

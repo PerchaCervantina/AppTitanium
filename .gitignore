@@ -9,3 +9,7 @@ captures/
 .cxx/
 app/release/
 app/debug/
+
+# Credenciales de Firebase: cada persona/máquina pone su propio fichero
+# real (ver FIREBASE_SETUP.md), nunca se sube al repositorio.
+app/google-services.json

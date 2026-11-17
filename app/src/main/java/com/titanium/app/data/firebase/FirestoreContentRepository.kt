@@ -1,0 +1,210 @@
+package com.titanium.app.data.firebase
+
+import android.net.Uri
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.tasks.await
+import java.util.UUID
+
+/**
+ * Lee y escribe todo el contenido "público" de la app (antes vivía en
+ * assets/content.json, ahora en Firestore) y sube las imágenes que los
+ * administradores adjuntan a Firebase Storage.
+ *
+ * Las lecturas no requieren haber iniciado sesión (son públicas); las
+ * escrituras solo las aceptan las reglas de seguridad si el email de quien
+ * las hace está en la colección `admins` como activo (ver
+ * firestore.rules). Esta clase no decide permisos, solo llama a Firebase.
+ */
+class FirestoreContentRepository(
+    private val db: FirebaseFirestore = FirebaseFirestore.getInstance(),
+    private val storage: FirebaseStorage = FirebaseStorage.getInstance()
+) {
+
+    // ---- Presentación y contacto (documentos únicos) ----
+
+    fun observePresentation(): Flow<PresentationInfo> = callbackFlow {
+        val registration = db.collection("config").document("presentation")
+            .addSnapshotListener { snapshot, _ ->
+                trySend(
+                    PresentationInfo(
+                        name = snapshot?.getString("name") ?: "Titanium",
+                        description = snapshot?.getString("description") ?: "",
+                        location = snapshot?.getString("location") ?: ""
+                    )
+                )
+            }
+        awaitClose { registration.remove() }
+    }
+
+    suspend fun updatePresentation(info: PresentationInfo) {
+        db.collection("config").document("presentation")
+            .set(mapOf("name" to info.name, "description" to info.description, "location" to info.location))
+            .await()
+    }
+
+    fun observeMembership(): Flow<MembershipInfo> = callbackFlow {
+        val registration = db.collection("config").document("membership")
+            .addSnapshotListener { snapshot, _ ->
+                trySend(
+                    MembershipInfo(
+                        intro = snapshot?.getString("intro") ?: "",
+                        whatsappNumber = snapshot?.getString("whatsappNumber") ?: "",
+                        whatsappMessage = snapshot?.getString("whatsappMessage") ?: ""
+                    )
+                )
+            }
+        awaitClose { registration.remove() }
+    }
+
+    suspend fun updateMembership(info: MembershipInfo) {
+        db.collection("config").document("membership")
+            .set(
+                mapOf(
+                    "intro" to info.intro,
+                    "whatsappNumber" to info.whatsappNumber,
+                    "whatsappMessage" to info.whatsappMessage
+                )
+            )
+            .await()
+    }
+
+    // ---- Próximos eventos ----
+
+    fun observeEvents(): Flow<List<EventEntry>> = callbackFlow {
+        val registration = db.collection("events")
+            .addSnapshotListener { snapshot, _ ->
+                val events = snapshot?.documents?.map { it.toEvent() } ?: emptyList()
+                trySend(events)
+            }
+        awaitClose { registration.remove() }
+    }
+
+    suspend fun addOrUpdateEvent(event: EventEntry) {
+        val id = event.id.ifBlank { UUID.randomUUID().toString() }
+        db.collection("events").document(id)
+            .set(event.copy(id = id, createdAt = event.createdAt.takeIf { it > 0 } ?: System.currentTimeMillis()))
+            .await()
+    }
+
+    suspend fun deleteEvent(id: String) {
+        db.collection("events").document(id).delete().await()
+    }
+
+    // ---- Nuestra sede ----
+
+    fun observeVenuePhotos(): Flow<List<VenuePhoto>> = callbackFlow {
+        val registration = db.collection("venuePhotos")
+            .addSnapshotListener { snapshot, _ ->
+                trySend(snapshot?.documents?.map { it.toVenuePhoto() } ?: emptyList())
+            }
+        awaitClose { registration.remove() }
+    }
+
+    suspend fun addVenuePhoto(imageUrl: String, caption: String) {
+        val id = UUID.randomUUID().toString()
+        db.collection("venuePhotos").document(id)
+            .set(VenuePhoto(id = id, imageUrl = imageUrl, caption = caption, createdAt = System.currentTimeMillis()))
+            .await()
+    }
+
+    suspend fun deleteVenuePhoto(id: String) {
+        db.collection("venuePhotos").document(id).delete().await()
+    }
+
+    // ---- Galería: fotos ----
+
+    fun observeGalleryPhotos(): Flow<List<GalleryPhoto>> = callbackFlow {
+        val registration = db.collection("galleryPhotos")
+            .addSnapshotListener { snapshot, _ ->
+                trySend(snapshot?.documents?.map { it.toGalleryPhoto() } ?: emptyList())
+            }
+        awaitClose { registration.remove() }
+    }
+
+    suspend fun addGalleryPhoto(imageUrl: String, caption: String) {
+        val id = UUID.randomUUID().toString()
+        db.collection("galleryPhotos").document(id)
+            .set(GalleryPhoto(id = id, imageUrl = imageUrl, caption = caption, createdAt = System.currentTimeMillis()))
+            .await()
+    }
+
+    suspend fun deleteGalleryPhoto(id: String) {
+        db.collection("galleryPhotos").document(id).delete().await()
+    }
+
+    // ---- Galería: vídeos (enlaces a Instagram/Facebook, sin alojar el fichero) ----
+
+    fun observeGalleryVideoLinks(): Flow<List<GalleryVideoLink>> = callbackFlow {
+        val registration = db.collection("galleryVideoLinks")
+            .addSnapshotListener { snapshot, _ ->
+                trySend(snapshot?.documents?.map { it.toGalleryVideoLink() } ?: emptyList())
+            }
+        awaitClose { registration.remove() }
+    }
+
+    suspend fun addGalleryVideoLink(linkUrl: String, caption: String, thumbnailImageUrl: String?) {
+        val id = UUID.randomUUID().toString()
+        db.collection("galleryVideoLinks").document(id)
+            .set(
+                GalleryVideoLink(
+                    id = id,
+                    linkUrl = linkUrl,
+                    caption = caption,
+                    thumbnailImageUrl = thumbnailImageUrl,
+                    createdAt = System.currentTimeMillis()
+                )
+            )
+            .await()
+    }
+
+    suspend fun deleteGalleryVideoLink(id: String) {
+        db.collection("galleryVideoLinks").document(id).delete().await()
+    }
+
+    // ---- Subida de imágenes ----
+
+    /** Sube una imagen elegida por un administrador y devuelve su URL pública. */
+    suspend fun uploadImage(localUri: Uri, folder: String): String {
+        val fileName = "${UUID.randomUUID()}.jpg"
+        val ref = storage.reference.child("$folder/$fileName")
+        ref.putFile(localUri).await()
+        return ref.downloadUrl.await().toString()
+    }
+}
+
+private fun com.google.firebase.firestore.DocumentSnapshot.toEvent() = EventEntry(
+    id = id,
+    day = getString("day") ?: "",
+    month = getString("month") ?: "",
+    bandName = getString("bandName") ?: "",
+    musicDescription = getString("musicDescription") ?: "",
+    logoImageUrl = getString("logoImageUrl"),
+    socialUrl = getString("socialUrl"),
+    createdAt = getLong("createdAt") ?: 0L
+)
+
+private fun com.google.firebase.firestore.DocumentSnapshot.toVenuePhoto() = VenuePhoto(
+    id = id,
+    imageUrl = getString("imageUrl") ?: "",
+    caption = getString("caption") ?: "",
+    createdAt = getLong("createdAt") ?: 0L
+)
+
+private fun com.google.firebase.firestore.DocumentSnapshot.toGalleryPhoto() = GalleryPhoto(
+    id = id,
+    imageUrl = getString("imageUrl") ?: "",
+    caption = getString("caption") ?: "",
+    createdAt = getLong("createdAt") ?: 0L
+)
+
+private fun com.google.firebase.firestore.DocumentSnapshot.toGalleryVideoLink() = GalleryVideoLink(
+    id = id,
+    linkUrl = getString("linkUrl") ?: "",
+    caption = getString("caption") ?: "",
+    thumbnailImageUrl = getString("thumbnailImageUrl"),
+    createdAt = getLong("createdAt") ?: 0L
+)

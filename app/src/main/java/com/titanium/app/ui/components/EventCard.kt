@@ -33,10 +33,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
-import com.titanium.app.data.EventItem
+import com.titanium.app.data.firebase.EventEntry
 
 @Composable
-fun EventCard(event: EventItem, modifier: Modifier = Modifier) {
+fun EventCard(event: EventEntry, modifier: Modifier = Modifier) {
     var expanded by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
@@ -75,8 +75,8 @@ fun EventCard(event: EventItem, modifier: Modifier = Modifier) {
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
 
-                    AssetOrPlaceholderImage(
-                        drawableName = event.logoDrawable,
+                    RemoteOrPlaceholderImage(
+                        imageUrl = event.logoImageUrl,
                         contentDescription = "Logo de ${event.bandName}",
                         contentScale = ContentScale.Fit,
                         modifier = Modifier

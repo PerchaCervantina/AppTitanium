@@ -1,5 +1,6 @@
 package com.titanium.app.ui.components
 
+import android.content.Intent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,7 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PlayCircle
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
@@ -25,10 +26,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.titanium.app.data.GalleryContent
-import com.titanium.app.data.GalleryPhoto
-import com.titanium.app.data.GalleryVideo
+import androidx.core.net.toUri
+import com.titanium.app.data.firebase.GalleryPhoto
+import com.titanium.app.data.firebase.GalleryVideoLink
 
 private enum class GalleryTab(val label: String) {
     PHOTOS("Fotos"),
@@ -38,9 +40,12 @@ private enum class GalleryTab(val label: String) {
 private const val GALLERY_COLUMNS = 2
 
 @Composable
-fun GallerySection(gallery: GalleryContent, modifier: Modifier = Modifier) {
+fun GallerySection(
+    photos: List<GalleryPhoto>,
+    videoLinks: List<GalleryVideoLink>,
+    modifier: Modifier = Modifier
+) {
     var selectedTab by remember { mutableStateOf(GalleryTab.PHOTOS) }
-    var openVideo by remember { mutableStateOf<GalleryVideo?>(null) }
 
     Column(modifier = modifier) {
         SectionTitle(text = "Galería")
@@ -61,18 +66,9 @@ fun GallerySection(gallery: GalleryContent, modifier: Modifier = Modifier) {
         }
 
         when (selectedTab) {
-            GalleryTab.PHOTOS -> PhotoGrid(photos = gallery.photos)
-            GalleryTab.VIDEOS -> VideoGrid(videos = gallery.videos, onVideoClick = { openVideo = it })
+            GalleryTab.PHOTOS -> PhotoGrid(photos = photos)
+            GalleryTab.VIDEOS -> VideoLinkGrid(videoLinks = videoLinks)
         }
-    }
-
-    val video = openVideo
-    if (video != null) {
-        FullscreenVideoDialog(
-            videoAssetPath = "videos/${video.videoAsset}",
-            caption = video.caption,
-            onDismiss = { openVideo = null }
-        )
     }
 }
 
@@ -81,8 +77,7 @@ fun GallerySection(gallery: GalleryContent, modifier: Modifier = Modifier) {
  * LazyColumn de la pantalla principal, así que anidar aquí un
  * LazyVerticalGrid (que también es scrollable) provoca un
  * IllegalStateException por restricciones de altura infinita. Al ser
- * listas de contenido acotadas (fotos/vídeos de la galería), basta con
- * repartirlas en filas normales.
+ * listas de contenido acotadas, basta con repartirlas en filas normales.
  */
 @Composable
 private fun PhotoGrid(photos: List<GalleryPhoto>) {
@@ -100,8 +95,8 @@ private fun PhotoGrid(photos: List<GalleryPhoto>) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 rowPhotos.forEach { photo ->
                     Column(modifier = Modifier.weight(1f)) {
-                        AssetOrPlaceholderImage(
-                            drawableName = photo.drawable,
+                        RemoteOrPlaceholderImage(
+                            imageUrl = photo.imageUrl,
                             contentDescription = photo.caption,
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -123,39 +118,47 @@ private fun PhotoGrid(photos: List<GalleryPhoto>) {
     }
 }
 
+/**
+ * Los vídeos ya no se alojan en la app: cada tarjeta abre el enlace a la
+ * publicación de Instagram/Facebook donde está subido el vídeo.
+ */
 @Composable
-private fun VideoGrid(videos: List<GalleryVideo>, onVideoClick: (GalleryVideo) -> Unit) {
-    if (videos.isEmpty()) {
+private fun VideoLinkGrid(videoLinks: List<GalleryVideoLink>) {
+    if (videoLinks.isEmpty()) {
         EmptyGalleryMessage("Todavía no se han añadido vídeos a la galería.")
         return
     }
+    val context = LocalContext.current
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 12.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        videos.chunked(GALLERY_COLUMNS).forEach { rowVideos ->
+        videoLinks.chunked(GALLERY_COLUMNS).forEach { rowLinks ->
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                rowVideos.forEach { video ->
+                rowLinks.forEach { link ->
                     Column(
                         modifier = Modifier
                             .weight(1f)
-                            .clickable { onVideoClick(video) }
+                            .clickable {
+                                context.startActivity(Intent(Intent.ACTION_VIEW, link.linkUrl.toUri()))
+                            }
                     ) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .aspectRatio(1f)
                         ) {
-                            AssetOrPlaceholderImage(
-                                drawableName = video.thumbnailDrawable,
-                                contentDescription = video.caption,
+                            RemoteOrPlaceholderImage(
+                                imageUrl = link.thumbnailImageUrl,
+                                contentDescription = link.caption,
                                 modifier = Modifier.fillMaxSize()
                             )
                             Icon(
-                                imageVector = Icons.Default.PlayCircle,
-                                contentDescription = "Reproducir vídeo",
+                                imageVector = Icons.AutoMirrored.Filled.OpenInNew,
+                                contentDescription = "Abrir vídeo",
                                 tint = Color.White,
                                 modifier = Modifier
                                     .align(Alignment.Center)
@@ -163,14 +166,14 @@ private fun VideoGrid(videos: List<GalleryVideo>, onVideoClick: (GalleryVideo) -
                             )
                         }
                         Text(
-                            text = video.caption,
+                            text = link.caption,
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(top = 4.dp, bottom = 4.dp)
                         )
                     }
                 }
-                repeat(GALLERY_COLUMNS - rowVideos.size) {
+                repeat(GALLERY_COLUMNS - rowLinks.size) {
                     Spacer(modifier = Modifier.weight(1f))
                 }
             }

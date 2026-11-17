@@ -1,20 +1,19 @@
 package com.titanium.app.ui.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Image
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.titanium.app.R
-import com.titanium.app.data.ContentRepository
+import coil.compose.AsyncImage
 
 /**
  * Título de sección con el estilo "cartel" de la app (texto en mayúsculas).
@@ -32,24 +31,35 @@ fun SectionTitle(text: String, modifier: Modifier = Modifier) {
 }
 
 /**
- * Muestra la imagen cuyo nombre de recurso drawable viene en [drawableName].
- * Si ese recurso todavía no existe en el proyecto (porque no se ha añadido
- * la foto real), se muestra un icono comodín para que nada se rompa.
+ * Muestra la imagen de la URL de Firebase Storage que haya subido un
+ * administrador. Si todavía no hay imagen (null/vacía), muestra un icono
+ * comodín en su lugar, para que nada se rompa mientras se va completando
+ * el contenido.
  */
 @Composable
-fun AssetOrPlaceholderImage(
-    drawableName: String?,
+fun RemoteOrPlaceholderImage(
+    imageUrl: String?,
     contentDescription: String?,
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Crop
 ) {
-    val context = LocalContext.current
-    val resId = remember(drawableName) { ContentRepository.drawableIdOrNull(context, drawableName) }
-
-    Image(
-        painter = painterResource(resId ?: R.drawable.ic_placeholder_image),
-        contentDescription = contentDescription,
-        modifier = modifier.clip(MaterialTheme.shapes.medium),
-        contentScale = if (resId != null) contentScale else ContentScale.Inside
-    )
+    if (imageUrl.isNullOrBlank()) {
+        androidx.compose.foundation.layout.Box(
+            modifier = modifier.clip(MaterialTheme.shapes.medium),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.Image,
+                contentDescription = contentDescription,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    } else {
+        AsyncImage(
+            model = imageUrl,
+            contentDescription = contentDescription,
+            modifier = modifier.clip(MaterialTheme.shapes.medium),
+            contentScale = contentScale
+        )
+    }
 }

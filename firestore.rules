@@ -1,0 +1,65 @@
+rules_version = '2';
+
+// Reglas de seguridad de Firestore para Titanium.
+//
+// Cómo pegarlas en Firebase: Consola de Firebase -> tu proyecto ->
+// Firestore Database -> pestaña "Reglas" -> pega este contenido entero ->
+// Publicar.
+//
+// Idea general:
+//  - Todo el contenido (eventos, sede, galería, presentación, contacto)
+//    se puede LEER por cualquiera, sin iniciar sesión: es lo que ve el
+//    público en la app.
+//  - Solo se puede ESCRIBIR si el email de quien hace la petición está en
+//    la colección `admins` con active = true.
+//  - Solo se puede escribir en la propia colección `admins` (dar/quitar
+//    permisos a otros) si además se tiene canManageAdmins = true.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function emailDoc() {
+      return /databases/$(database)/documents/admins/$(request.auth.token.email);
+    }
+
+    function isActiveAdmin() {
+      return request.auth != null &&
+        request.auth.token.email != null &&
+        exists(emailDoc()) &&
+        get(emailDoc()).data.active == true;
+    }
+
+    function canManageAdmins() {
+      return isActiveAdmin() && get(emailDoc()).data.canManageAdmins == true;
+    }
+
+    match /admins/{email} {
+      allow read: if true;
+      allow write: if canManageAdmins();
+    }
+
+    match /config/{document} {
+      allow read: if true;
+      allow write: if isActiveAdmin();
+    }
+
+    match /events/{eventId} {
+      allow read: if true;
+      allow write: if isActiveAdmin();
+    }
+
+    match /venuePhotos/{photoId} {
+      allow read: if true;
+      allow write: if isActiveAdmin();
+    }
+
+    match /galleryPhotos/{photoId} {
+      allow read: if true;
+      allow write: if isActiveAdmin();
+    }
+
+    match /galleryVideoLinks/{linkId} {
+      allow read: if true;
+      allow write: if isActiveAdmin();
+    }
+  }
+}

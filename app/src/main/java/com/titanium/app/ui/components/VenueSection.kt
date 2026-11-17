@@ -14,10 +14,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.titanium.app.data.CaptionedImage
+import com.titanium.app.data.firebase.VenuePhoto
 
 @Composable
-fun VenueSection(images: List<CaptionedImage>, modifier: Modifier = Modifier) {
+fun VenueSection(images: List<VenuePhoto>, modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
         SectionTitle(text = "Nuestra sede")
 
@@ -35,10 +35,10 @@ fun VenueSection(images: List<CaptionedImage>, modifier: Modifier = Modifier) {
             contentPadding = PaddingValues(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            items(images) { image ->
+            items(images, key = { it.id }) { image ->
                 Column(modifier = Modifier.width(220.dp)) {
-                    AssetOrPlaceholderImage(
-                        drawableName = image.drawable,
+                    RemoteOrPlaceholderImage(
+                        imageUrl = image.imageUrl,
                         contentDescription = image.caption,
                         modifier = Modifier
                             .fillMaxWidth()
