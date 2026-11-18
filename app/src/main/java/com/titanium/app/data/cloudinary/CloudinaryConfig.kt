@@ -8,8 +8,8 @@ package com.titanium.app.data.cloudinary
  * panel de Cloudinary, no con una clave secreta aquí.
  */
 object CloudinaryConfig {
-    const val CLOUD_NAME = "PON_AQUI_TU_CLOUD_NAME"
-    const val UPLOAD_PRESET = "PON_AQUI_TU_UPLOAD_PRESET"
+    const val CLOUD_NAME = "xngqkzli"
+    const val UPLOAD_PRESET = "upload preset"
 
     val isConfigured: Boolean
         get() = CLOUD_NAME != "PON_AQUI_TU_CLOUD_NAME" && UPLOAD_PRESET != "PON_AQUI_TU_UPLOAD_PRESET"
