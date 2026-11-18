@@ -38,7 +38,6 @@ fun PresentationAdminScreen(
     val presentation by repository.observePresentation().collectAsState(initial = PresentationInfo())
     val membership by repository.observeMembership().collectAsState(initial = MembershipInfo())
 
-    var name by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var location by remember { mutableStateOf("") }
     var membershipIntro by remember { mutableStateOf("") }
@@ -50,7 +49,6 @@ fun PresentationAdminScreen(
     // actualización en tiempo real.
     LaunchedEffect(presentation, membership) {
         if (!initialized) {
-            name = presentation.name
             description = presentation.description
             location = presentation.location
             membershipIntro = membership.intro
@@ -71,11 +69,11 @@ fun PresentationAdminScreen(
                 .padding(16.dp)
         ) {
             Text(text = "Presentación", style = MaterialTheme.typography.titleMedium)
-            OutlinedTextField(
-                value = name,
-                onValueChange = { name = it },
-                label = { Text("Nombre de la asociación") },
-                modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+            Text(
+                text = "El nombre de la asociación se muestra con el logo y no se edita aquí.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 4.dp)
             )
             OutlinedTextField(
                 value = description,
@@ -90,7 +88,7 @@ fun PresentationAdminScreen(
                 modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
             )
             OutlinedButton(
-                onClick = { scope.launch { repository.updatePresentation(PresentationInfo(name, description, location)) } },
+                onClick = { scope.launch { repository.updatePresentation(PresentationInfo(description, location)) } },
                 modifier = Modifier.padding(top = 12.dp, bottom = 12.dp)
             ) { Text("Guardar presentación") }
 

@@ -14,7 +14,6 @@ data class AdminEntry(
 )
 
 data class PresentationInfo(
-    val name: String = "Titanium",
     val description: String = "",
     val location: String = ""
 )

@@ -1,10 +1,12 @@
 package com.titanium.app.ui.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
@@ -17,11 +19,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.titanium.app.R
 import com.titanium.app.data.firebase.PresentationInfo
 
 /**
- * [onAdminAccessRequested] se dispara al mantener pulsado el nombre de la
+ * [onAdminAccessRequested] se dispara al mantener pulsado el logo de la
  * asociación: es el punto de entrada (escondido para el público) al login
  * de administradores.
  */
@@ -38,13 +43,18 @@ fun HeaderCard(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
-            Text(
-                text = presentation.name.uppercase(),
-                style = MaterialTheme.typography.displayLarge,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.pointerInput(Unit) {
-                    detectTapGestures(onLongPress = { onAdminAccessRequested() })
-                }
+            // Logo fijo de la asociación: no es editable desde el panel de
+            // administración (a diferencia del resto de esta cabecera).
+            Image(
+                painter = painterResource(R.drawable.logo_titanium),
+                contentDescription = "Titanium",
+                contentScale = ContentScale.Fit,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(110.dp)
+                    .pointerInput(Unit) {
+                        detectTapGestures(onLongPress = { onAdminAccessRequested() })
+                    }
             )
             Text(
                 text = presentation.description,

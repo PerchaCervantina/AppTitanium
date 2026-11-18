@@ -28,7 +28,6 @@ class FirestoreContentRepository(
             .addSnapshotListener { snapshot, _ ->
                 trySend(
                     PresentationInfo(
-                        name = snapshot?.getString("name") ?: "Titanium",
                         description = snapshot?.getString("description") ?: "",
                         location = snapshot?.getString("location") ?: ""
                     )
@@ -39,7 +38,7 @@ class FirestoreContentRepository(
 
     suspend fun updatePresentation(info: PresentationInfo) {
         db.collection("config").document("presentation")
-            .set(mapOf("name" to info.name, "description" to info.description, "location" to info.location))
+            .set(mapOf("description" to info.description, "location" to info.location))
             .await()
     }
 
