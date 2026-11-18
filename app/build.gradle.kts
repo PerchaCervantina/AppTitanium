@@ -4,6 +4,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
     id("org.jetbrains.kotlin.plugin.serialization")
     id("com.google.gms.google-services")
+    id("com.google.firebase.appdistribution")
 }
 
 android {
@@ -21,6 +22,15 @@ android {
     }
 
     buildTypes {
+        debug {
+            // Reparto de versiones de prueba sin Play Store: ver
+            // APP_DISTRIBUTION.md para cómo añadir testers y subir una
+            // nueva versión.
+            firebaseAppDistribution {
+                releaseNotesFile = "release_notes.txt"
+                serviceCredentialsFile = "app-distribution-service-account.json"
+            }
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")

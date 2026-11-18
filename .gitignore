@@ -13,3 +13,8 @@ app/debug/
 # Credenciales de Firebase: cada persona/máquina pone su propio fichero
 # real (ver FIREBASE_SETUP.md), nunca se sube al repositorio.
 app/google-services.json
+
+# Clave de la cuenta de servicio para subir builds a Firebase App
+# Distribution (ver APP_DISTRIBUTION.md): es una credencial real, nunca
+# se sube al repositorio.
+app/app-distribution-service-account.json
