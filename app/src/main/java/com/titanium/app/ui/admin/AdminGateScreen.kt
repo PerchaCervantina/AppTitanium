@@ -1,5 +1,6 @@
 package com.titanium.app.ui.admin
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -33,6 +34,20 @@ fun AdminGateScreen(session: AdminSession, onExit: () -> Unit) {
                 else -> AdminScreenState.DASHBOARD
             }
         )
+    }
+
+    // El botón atrás del sistema debe navegar dentro del panel (a la
+    // pantalla anterior), no cerrar la app directamente: sin esto, Android
+    // trata cada pantalla de admin como si fuera la pantalla principal.
+    BackHandler(enabled = true) {
+        val isSubScreen = screen !in setOf(
+            AdminScreenState.DASHBOARD, AdminScreenState.AUTH, AdminScreenState.NOT_AUTHORIZED
+        )
+        if (isSubScreen) {
+            screen = AdminScreenState.DASHBOARD
+        } else {
+            onExit()
+        }
     }
 
     when (screen) {
