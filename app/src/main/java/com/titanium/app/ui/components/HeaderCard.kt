@@ -51,7 +51,7 @@ fun HeaderCard(
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(110.dp)
+                    .height(190.dp)
                     .pointerInput(Unit) {
                         detectTapGestures(onLongPress = { onAdminAccessRequested() })
                     }
