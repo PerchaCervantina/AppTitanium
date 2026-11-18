@@ -33,7 +33,7 @@ Desde el panel de administración:
 - **Nuestra sede**: añade una foto del local con un texto. Para quitar una, pulsa "Eliminar" en su tarjeta.
 - **Galería → Fotos**: igual que la sede, foto + texto.
 - **Galería → Vídeos (enlace)**: aquí **no se sube el vídeo**, solo se pega el enlace a la publicación ya subida al Instagram o Facebook de la asociación, con un texto y, opcionalmente, una miniatura. Al tocarlo en la app, se abre ese enlace. Esto es así para no generar coste de almacenamiento/ancho de banda por los vídeos.
-- **Presentación y contacto**: aquí se cambia el nombre, el texto de presentación, la localización, el texto de "Hazte socio" y el número/mensaje de WhatsApp.
+- **Presentación y contacto**: aquí se cambia el nombre, el texto de presentación, la localización, el texto de "Hazte socio" y el enlace de Instagram del botón "Escríbenos en Instagram".
 
 Todo se guarda al momento: en cuanto pulsas "Añadir"/"Guardar", ya lo ve cualquiera que abra la app (no hace falta volver a instalar nada).
 

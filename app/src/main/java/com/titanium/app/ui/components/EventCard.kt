@@ -3,12 +3,13 @@ package com.titanium.app.ui.components
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -29,6 +30,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -68,36 +71,58 @@ fun EventCard(event: EventEntry, modifier: Modifier = Modifier) {
             }
 
             AnimatedVisibility(visible = expanded, enter = expandVertically(), exit = shrinkVertically()) {
-                Column(modifier = Modifier.padding(top = 16.dp)) {
-                    Text(
-                        text = event.musicDescription,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                val surfaceColor = MaterialTheme.colorScheme.surface
+                val hasLogo = !event.logoImageUrl.isNullOrBlank()
 
-                    RemoteOrPlaceholderImage(
-                        imageUrl = event.logoImageUrl,
-                        contentDescription = "Logo de ${event.bandName}",
-                        contentScale = ContentScale.Fit,
-                        modifier = Modifier
-                            .padding(top = 14.dp)
-                            .fillMaxWidth()
-                            .height(140.dp)
-                    )
-
-                    if (!event.socialUrl.isNullOrBlank()) {
-                        TextButton(
-                            onClick = {
-                                val intent = android.content.Intent(
-                                    android.content.Intent.ACTION_VIEW,
-                                    event.socialUrl.toUri()
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = if (hasLogo) 170.dp else 0.dp)
+                ) {
+                    if (hasLogo) {
+                        // El logo hace de fondo del desplegable, difuminado hacia el
+                        // color de la tarjeta para que se "funda" con ella en vez de
+                        // verse como una foto recortada aparte.
+                        RemoteOrPlaceholderImage(
+                            imageUrl = event.logoImageUrl,
+                            contentDescription = "Logo de ${event.bandName}",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .matchParentSize()
+                                .alpha(0.35f)
+                        )
+                        Box(
+                            modifier = Modifier
+                                .matchParentSize()
+                                .background(
+                                    Brush.verticalGradient(
+                                        colors = listOf(surfaceColor.copy(alpha = 0.2f), surfaceColor)
+                                    )
                                 )
-                                context.startActivity(intent)
-                            },
-                            modifier = Modifier.padding(top = 4.dp)
-                        ) {
-                            Icon(imageVector = Icons.Default.Link, contentDescription = null)
-                            Text(text = " Redes sociales del grupo")
+                        )
+                    }
+
+                    Column(modifier = Modifier.padding(top = 16.dp, bottom = if (hasLogo) 12.dp else 0.dp)) {
+                        Text(
+                            text = event.musicDescription,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+
+                        if (!event.socialUrl.isNullOrBlank()) {
+                            TextButton(
+                                onClick = {
+                                    val intent = android.content.Intent(
+                                        android.content.Intent.ACTION_VIEW,
+                                        event.socialUrl.toUri()
+                                    )
+                                    context.startActivity(intent)
+                                },
+                                modifier = Modifier.padding(top = 4.dp)
+                            ) {
+                                Icon(imageVector = Icons.Default.Link, contentDescription = null)
+                                Text(text = " Redes sociales del grupo")
+                            }
                         }
                     }
                 }

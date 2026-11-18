@@ -49,8 +49,7 @@ class FirestoreContentRepository(
                 trySend(
                     MembershipInfo(
                         intro = snapshot?.getString("intro") ?: "",
-                        whatsappNumber = snapshot?.getString("whatsappNumber") ?: "",
-                        whatsappMessage = snapshot?.getString("whatsappMessage") ?: ""
+                        instagramUrl = snapshot?.getString("instagramUrl") ?: ""
                     )
                 )
             }
@@ -62,8 +61,7 @@ class FirestoreContentRepository(
             .set(
                 mapOf(
                     "intro" to info.intro,
-                    "whatsappNumber" to info.whatsappNumber,
-                    "whatsappMessage" to info.whatsappMessage
+                    "instagramUrl" to info.instagramUrl
                 )
             )
             .await()

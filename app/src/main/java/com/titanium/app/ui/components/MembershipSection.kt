@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Chat
+import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -19,7 +19,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.titanium.app.data.firebase.MembershipInfo
-import java.net.URLEncoder
 
 @Composable
 fun MembershipSection(membership: MembershipInfo, modifier: Modifier = Modifier) {
@@ -43,17 +42,15 @@ fun MembershipSection(membership: MembershipInfo, modifier: Modifier = Modifier)
 
                 Button(
                     onClick = {
-                        val encodedMessage = URLEncoder.encode(membership.whatsappMessage, "UTF-8")
-                        val uri = "https://wa.me/${membership.whatsappNumber}?text=$encodedMessage".toUri()
-                        context.startActivity(Intent(Intent.ACTION_VIEW, uri))
+                        context.startActivity(Intent(Intent.ACTION_VIEW, membership.instagramUrl.toUri()))
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 18.dp)
                 ) {
-                    Icon(imageVector = Icons.AutoMirrored.Filled.Chat, contentDescription = null)
-                    Text(text = "  Contactar por WhatsApp")
+                    Icon(imageVector = Icons.Default.PhotoCamera, contentDescription = null)
+                    Text(text = "  Escríbenos en Instagram")
                 }
             }
         }

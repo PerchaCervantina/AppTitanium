@@ -42,8 +42,7 @@ fun PresentationAdminScreen(
     var description by remember { mutableStateOf("") }
     var location by remember { mutableStateOf("") }
     var membershipIntro by remember { mutableStateOf("") }
-    var whatsappNumber by remember { mutableStateOf("") }
-    var whatsappMessage by remember { mutableStateOf("") }
+    var instagramUrl by remember { mutableStateOf("") }
     var initialized by remember { mutableStateOf(false) }
 
     // Solo rellenamos los campos una vez con lo que haya en Firestore, para
@@ -55,8 +54,7 @@ fun PresentationAdminScreen(
             description = presentation.description
             location = presentation.location
             membershipIntro = membership.intro
-            whatsappNumber = membership.whatsappNumber
-            whatsappMessage = membership.whatsappMessage
+            instagramUrl = membership.instagramUrl
             initialized = true
         }
     }
@@ -98,7 +96,7 @@ fun PresentationAdminScreen(
 
             HorizontalDivider()
 
-            Text(text = "Hazte socio (WhatsApp)", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 16.dp))
+            Text(text = "Hazte socio (Instagram)", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 16.dp))
             OutlinedTextField(
                 value = membershipIntro,
                 onValueChange = { membershipIntro = it },
@@ -106,21 +104,15 @@ fun PresentationAdminScreen(
                 modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
             )
             OutlinedTextField(
-                value = whatsappNumber,
-                onValueChange = { whatsappNumber = it },
-                label = { Text("Número de WhatsApp (sin + ni espacios)") },
-                modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
-            )
-            OutlinedTextField(
-                value = whatsappMessage,
-                onValueChange = { whatsappMessage = it },
-                label = { Text("Mensaje predefinido") },
+                value = instagramUrl,
+                onValueChange = { instagramUrl = it },
+                label = { Text("Enlace de Instagram (perfil o chat)") },
                 modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
             )
             OutlinedButton(
                 onClick = {
                     scope.launch {
-                        repository.updateMembership(MembershipInfo(membershipIntro, whatsappNumber, whatsappMessage))
+                        repository.updateMembership(MembershipInfo(membershipIntro, instagramUrl))
                     }
                 },
                 modifier = Modifier.padding(top = 12.dp)

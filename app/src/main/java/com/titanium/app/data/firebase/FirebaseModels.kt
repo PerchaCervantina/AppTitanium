@@ -21,8 +21,9 @@ data class PresentationInfo(
 
 data class MembershipInfo(
     val intro: String = "",
-    val whatsappNumber: String = "",
-    val whatsappMessage: String = ""
+    // Enlace al perfil o al chat de Instagram de la asociación, ej.
+    // "https://instagram.com/asociaciontitanium" o un enlace directo al DM.
+    val instagramUrl: String = ""
 )
 
 data class EventEntry(
