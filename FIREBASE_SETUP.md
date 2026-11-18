@@ -31,11 +31,14 @@ pueden hacer desde el navegador del móvil, no hace falta ordenador.
 3. Elige una región (cualquiera de Europa, ej. `eur3`).
 4. Cuando esté creada: pestaña **Reglas** → borra lo que haya y pega el contenido completo del fichero [`firestore.rules`](firestore.rules) de este repositorio → **Publicar**.
 
-## 5. Activar Storage
+## 5. Las fotos: Cloudinary, no Firebase Storage
 
-1. Menú lateral → **Storage** → **Comenzar**.
-2. Igual que Firestore: modo producción.
-3. Pestaña **Rules** → pega el contenido completo de [`storage.rules`](storage.rules) → **Publicar**.
+Firebase Storage ahora exige el plan de pago **Blaze** incluso para el
+nivel gratuito, así que las fotos (logos de grupos, sede, galería) se
+suben a **Cloudinary**, que tiene un plan gratuito real sin pedir tarjeta.
+Es un paso aparte, con su propia guía: **[CLOUDINARY_SETUP.md](CLOUDINARY_SETUP.md)**.
+Firebase se queda solo con Authentication y Firestore (ambos gratis sin
+necesidad de Blaze).
 
 ## 6. Dar de alta al primer administrador (la presidenta)
 
@@ -56,7 +59,7 @@ A partir de aquí, la presidenta ya puede entrar en la app (mantener pulsado el 
 
 ## 7. Comprobar que compila
 
-Con el fichero `google-services.json` real ya colocado en `app/`, el proyecto debería compilar y ejecutarse en Android Studio igual que antes, pero ahora con las pantallas de administración funcionando contra Firebase de verdad.
+Con el fichero `google-services.json` real ya colocado en `app/` y Cloudinary configurado (paso 5), el proyecto debería compilar y ejecutarse en Android Studio igual que antes, pero ahora con las pantallas de administración funcionando de verdad.
 
 ---
 

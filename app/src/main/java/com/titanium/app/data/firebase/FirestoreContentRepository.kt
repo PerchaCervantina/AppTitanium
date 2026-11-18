@@ -1,8 +1,6 @@
 package com.titanium.app.data.firebase
 
-import android.net.Uri
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -11,8 +9,8 @@ import java.util.UUID
 
 /**
  * Lee y escribe todo el contenido "público" de la app (antes vivía en
- * assets/content.json, ahora en Firestore) y sube las imágenes que los
- * administradores adjuntan a Firebase Storage.
+ * assets/content.json, ahora en Firestore). La subida de imágenes no pasa
+ * por aquí: la hace CloudinaryRepository (ver ese fichero para el porqué).
  *
  * Las lecturas no requieren haber iniciado sesión (son públicas); las
  * escrituras solo las aceptan las reglas de seguridad si el email de quien
@@ -20,8 +18,7 @@ import java.util.UUID
  * firestore.rules). Esta clase no decide permisos, solo llama a Firebase.
  */
 class FirestoreContentRepository(
-    private val db: FirebaseFirestore = FirebaseFirestore.getInstance(),
-    private val storage: FirebaseStorage = FirebaseStorage.getInstance()
+    private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
 ) {
 
     // ---- Presentación y contacto (documentos únicos) ----
@@ -163,16 +160,6 @@ class FirestoreContentRepository(
 
     suspend fun deleteGalleryVideoLink(id: String) {
         db.collection("galleryVideoLinks").document(id).delete().await()
-    }
-
-    // ---- Subida de imágenes ----
-
-    /** Sube una imagen elegida por un administrador y devuelve su URL pública. */
-    suspend fun uploadImage(localUri: Uri, folder: String): String {
-        val fileName = "${UUID.randomUUID()}.jpg"
-        val ref = storage.reference.child("$folder/$fileName")
-        ref.putFile(localUri).await()
-        return ref.downloadUrl.await().toString()
     }
 }
 

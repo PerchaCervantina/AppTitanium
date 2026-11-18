@@ -17,15 +17,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.titanium.app.data.firebase.FirestoreContentRepository
+import com.titanium.app.data.cloudinary.CloudinaryRepository
 import kotlinx.coroutines.launch
 
 /**
  * Botón para elegir una imagen de la galería del móvil y subirla a
- * Firebase Storage. Mientras sube, muestra un indicador de carga; cuando
- * termina, llama a [onUploaded] con la URL resultante para guardarla junto
- * con el resto del formulario.
+ * Cloudinary (gratis, sin tarjeta). Mientras sube, muestra un indicador de
+ * carga; cuando termina, llama a [onUploaded] con la URL resultante para
+ * guardarla junto con el resto del formulario.
  */
 @Composable
 fun ImageUploadField(
@@ -33,8 +34,9 @@ fun ImageUploadField(
     label: String,
     imageUrl: String?,
     onUploaded: (String) -> Unit,
-    repository: FirestoreContentRepository = remember { FirestoreContentRepository() }
+    repository: CloudinaryRepository = remember { CloudinaryRepository() }
 ) {
+    val context = LocalContext.current
     var isUploading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
@@ -45,7 +47,7 @@ fun ImageUploadField(
             errorMessage = null
             scope.launch {
                 try {
-                    val url = repository.uploadImage(uri, folder)
+                    val url = repository.uploadImage(context, uri, folder)
                     onUploaded(url)
                 } catch (e: Exception) {
                     errorMessage = "No se ha podido subir la imagen: ${e.message}"

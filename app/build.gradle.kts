@@ -70,12 +70,16 @@ dependencies {
     // Lectura del fichero de contenidos local (vídeo de intro)
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
-    // Firebase: autenticación de administradores, contenidos y subida de imágenes
+    // Firebase: autenticación de administradores y contenidos (Auth + Firestore,
+    // ambos gratis sin necesidad de plan de pago)
     implementation(platform("com.google.firebase:firebase-bom:33.4.0"))
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-firestore-ktx")
-    implementation("com.google.firebase:firebase-storage-ktx")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.1")
+
+    // Subida de imágenes a Cloudinary (gratis, sin tarjeta) en vez de Firebase
+    // Storage, que exige el plan de pago Blaze incluso para el nivel gratuito.
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
     // Carga de imágenes remotas (subidas por los administradores)
     implementation("io.coil-kt:coil-compose:2.6.0")
