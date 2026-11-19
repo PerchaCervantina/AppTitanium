@@ -16,9 +16,11 @@ de Firebase (una sola vez) — ver **[FIREBASE_SETUP.md](FIREBASE_SETUP.md)**.
 
 Si tu cuenta no está autorizada todavía, la app te lo dirá y no verás los botones de edición — pide a otro administrador que te añada (ver más abajo).
 
+Al entrar como administrador no cambias de pantalla: ves la **misma app** que todo el mundo, solo que ahora con los botones de edición superpuestos (un **+** para añadir junto a cada título de sección, un lápiz o un **−** sobre cada elemento ya creado). Así siempre ves el resultado real, sin tener que ir a otra pantalla y volver para comprobarlo. Arriba del todo aparece una barra con tu email, y dos iconos: uno para gestionar administradores (si tienes ese permiso) y otro para cerrar sesión.
+
 ## Dar o quitar permisos a otro administrador
 
-Dentro del panel de administración, pulsa **"Gestionar administradores"** (solo lo ven quienes tengan ese permiso especial, normalmente la presidenta).
+Pulsa el icono de personas en la barra de arriba (**"Gestionar administradores"**, solo lo ven quienes tengan ese permiso especial, normalmente la presidenta).
 
 - **Dar permisos**: escribe el email de la persona y pulsa "Autorizar este email como administrador". Después, esa persona tiene que entrar en la app y registrarse con ese mismo email (paso 3 de arriba).
 - **Quitar permisos**: en la lista de administradores, pulsa "Quitar permisos" junto a su nombre. Deja de poder editar nada al instante, aunque conserve su cuenta.
@@ -27,13 +29,14 @@ Dentro del panel de administración, pulsa **"Gestionar administradores"** (solo
 
 ## Añadir/editar contenido
 
-Desde el panel de administración:
+Todo se hace directamente sobre la pantalla principal, con sesión iniciada:
 
-- **Próximos eventos**: pulsa el **+** junto al título para crear uno nuevo (o el lápiz sobre un evento ya creado para editarlo). Toca la fecha para elegirla con el calendario (coloca sola el día y el mes abreviado). Añade uno o varios **grupos** por su nombre — cada uno aparece junto a un botón "Quitar" para comprobar que está bien escrito. Hay **un único cartel** para todo el evento (vale para todos los grupos de ese día): tócalo para elegir o cambiar la imagen. Termina con "Añadir evento"/"Guardar cambios". Para borrar un evento, entra en editarlo y pulsa "Eliminar evento".
+- **Presentación** (la tarjeta de arriba del todo): pulsa el lápiz junto al texto para editar la presentación y la localización.
+- **Próximos eventos**: pulsa el **+** junto al título para crear uno nuevo, o el lápiz sobre un evento ya creado para editarlo. Toca la fecha para elegirla con el calendario (coloca sola el día y el mes abreviado). Añade uno o varios **grupos** por su nombre — cada uno aparece junto a un botón "Quitar" para comprobar que está bien escrito. Hay **un único cartel** para todo el evento (vale para todos los grupos de ese día): tócalo para elegir o cambiar la imagen. Termina con "Añadir evento"/"Guardar cambios". Para borrar un evento, entra a editarlo y pulsa "Eliminar evento".
 - **Nuestra sede**: pulsa el **+** junto al título para añadir una foto con su texto. Cada foto tiene un icono **−** en su esquina para eliminarla.
 - **Galería → Fotos**: igual que la sede, **+** para añadir (foto + texto), **−** sobre cada una para quitarla.
 - **Galería → Vídeos (enlace)**: aquí **no se sube el vídeo**, solo se pega (con el **+**) el enlace a la publicación ya subida al Instagram o Facebook de la asociación, con un texto y, opcionalmente, una miniatura. Al tocarlo en la app, se abre ese enlace. Esto es así para no generar coste de almacenamiento/ancho de banda por los vídeos.
-- **Presentación y contacto**: aquí se cambia el texto de presentación, la localización y, en "Hazte socio", el texto de invitación y los enlaces de Instagram/Facebook/TikTok/correo (cada botón solo aparece en la app si rellenas su campo).
+- **Hazte socio**: pulsa el lápiz de esa tarjeta para editar el texto de invitación y los enlaces de Instagram/Facebook/TikTok/correo (cada botón solo aparece en la app si rellenas su campo).
 
 Todo se guarda al momento: en cuanto pulsas "Añadir"/"Guardar", ya lo ve cualquiera que abra la app (no hace falta volver a instalar nada).
 
