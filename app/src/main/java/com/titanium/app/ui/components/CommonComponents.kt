@@ -1,5 +1,6 @@
 package com.titanium.app.ui.components
 
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -18,17 +19,25 @@ import coil.compose.AsyncImage
 
 /**
  * Título de sección con el estilo "cartel" de la app (texto en mayúsculas).
+ * [trailing] es, por ejemplo, el botón "+" que solo se muestra en modo
+ * administrador.
  */
 @Composable
-fun SectionTitle(text: String, modifier: Modifier = Modifier) {
-    Text(
-        text = text.uppercase(),
-        style = MaterialTheme.typography.headlineMedium,
-        color = MaterialTheme.colorScheme.onBackground,
+fun SectionTitle(text: String, modifier: Modifier = Modifier, trailing: (@Composable () -> Unit)? = null) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp, vertical = 12.dp)
-    )
+    ) {
+        Text(
+            text = text.uppercase(),
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.weight(1f)
+        )
+        trailing?.invoke()
+    }
 }
 
 /**

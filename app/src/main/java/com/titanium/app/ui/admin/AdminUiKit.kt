@@ -148,3 +148,53 @@ fun TappableImageUpload(
 
 /** Meses abreviados en español, por índice de Calendar.MONTH (0 = enero). */
 val MONTH_ABBREVIATIONS = listOf("ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC")
+
+/** Diálogo para añadir un vídeo de galería: solo el enlace, texto y miniatura opcional. */
+@Composable
+fun AddVideoLinkDialog(
+    onDismiss: () -> Unit,
+    onAdd: (linkUrl: String, caption: String, thumbnailUrl: String?) -> Unit
+) {
+    var linkUrl by remember { mutableStateOf("") }
+    var caption by remember { mutableStateOf("") }
+    var thumbnailUrl by remember { mutableStateOf<String?>(null) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Añadir vídeo") },
+        text = {
+            Column {
+                Text(
+                    text = "Pega el enlace al vídeo ya publicado en Instagram o Facebook (no se sube ningún fichero de vídeo).",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                OutlinedTextField(
+                    value = linkUrl,
+                    onValueChange = { linkUrl = it },
+                    label = { Text("Enlace al vídeo") },
+                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+                )
+                OutlinedTextField(
+                    value = caption,
+                    onValueChange = { caption = it },
+                    label = { Text("Texto descriptivo") },
+                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+                )
+                ImageUploadField(
+                    folder = "gallery_video_thumbnails",
+                    label = "Miniatura (opcional)",
+                    imageUrl = thumbnailUrl,
+                    onUploaded = { thumbnailUrl = it }
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(
+                enabled = linkUrl.isNotBlank() && caption.isNotBlank(),
+                onClick = { onAdd(linkUrl, caption, thumbnailUrl) }
+            ) { Text("Añadir") }
+        },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancelar") } }
+    )
+}

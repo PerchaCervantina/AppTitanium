@@ -1,6 +1,7 @@
 package com.titanium.app.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,17 +10,33 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.titanium.app.data.firebase.VenuePhoto
+import com.titanium.app.ui.admin.TranslucentIconButton
 
 @Composable
-fun VenueSection(images: List<VenuePhoto>, modifier: Modifier = Modifier) {
+fun VenueSection(
+    images: List<VenuePhoto>,
+    modifier: Modifier = Modifier,
+    isAdmin: Boolean = false,
+    onAddRequested: () -> Unit = {},
+    onDelete: (String) -> Unit = {}
+) {
     Column(modifier = modifier) {
-        SectionTitle(text = "Nuestra sede")
+        SectionTitle(
+            text = "Nuestra sede",
+            trailing = if (isAdmin) {
+                { TranslucentIconButton(icon = Icons.Default.Add, contentDescription = "Añadir foto", onClick = onAddRequested) }
+            } else null
+        )
 
         if (images.isEmpty()) {
             Text(
@@ -37,13 +54,23 @@ fun VenueSection(images: List<VenuePhoto>, modifier: Modifier = Modifier) {
         ) {
             items(images, key = { it.id }) { image ->
                 Column(modifier = Modifier.width(220.dp)) {
-                    RemoteOrPlaceholderImage(
-                        imageUrl = image.imageUrl,
-                        contentDescription = image.caption,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(150.dp)
-                    )
+                    Box(modifier = Modifier.fillMaxWidth()) {
+                        RemoteOrPlaceholderImage(
+                            imageUrl = image.imageUrl,
+                            contentDescription = image.caption,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(150.dp)
+                        )
+                        if (isAdmin) {
+                            TranslucentIconButton(
+                                icon = Icons.Default.Remove,
+                                contentDescription = "Eliminar foto",
+                                onClick = { onDelete(image.id) },
+                                modifier = Modifier.align(Alignment.TopEnd).padding(6.dp)
+                            )
+                        }
+                    }
                     Text(
                         text = image.caption,
                         style = MaterialTheme.typography.bodyMedium,

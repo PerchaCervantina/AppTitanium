@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
@@ -31,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.titanium.app.data.firebase.GalleryPhoto
 import com.titanium.app.data.firebase.GalleryVideoLink
+import com.titanium.app.ui.admin.TranslucentIconButton
 
 private enum class GalleryTab(val label: String) {
     PHOTOS("Fotos"),
@@ -43,31 +46,46 @@ private const val GALLERY_COLUMNS = 2
 fun GallerySection(
     photos: List<GalleryPhoto>,
     videoLinks: List<GalleryVideoLink>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isAdmin: Boolean = false,
+    onAddPhotoRequested: () -> Unit = {},
+    onDeletePhoto: (String) -> Unit = {},
+    onAddVideoRequested: () -> Unit = {},
+    onDeleteVideo: (String) -> Unit = {}
 ) {
     var selectedTab by remember { mutableStateOf(GalleryTab.PHOTOS) }
 
     Column(modifier = modifier) {
         SectionTitle(text = "Galería")
 
-        TabRow(
-            selectedTabIndex = selectedTab.ordinal,
-            containerColor = MaterialTheme.colorScheme.background,
-            contentColor = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(horizontal = 16.dp)
-        ) {
-            GalleryTab.entries.forEach { tab ->
-                Tab(
-                    selected = selectedTab == tab,
-                    onClick = { selectedTab = tab },
-                    text = { Text(tab.label) }
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 16.dp)) {
+            TabRow(
+                selectedTabIndex = selectedTab.ordinal,
+                containerColor = MaterialTheme.colorScheme.background,
+                contentColor = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.weight(1f)
+            ) {
+                GalleryTab.entries.forEach { tab ->
+                    Tab(
+                        selected = selectedTab == tab,
+                        onClick = { selectedTab = tab },
+                        text = { Text(tab.label) }
+                    )
+                }
+            }
+            if (isAdmin) {
+                TranslucentIconButton(
+                    icon = Icons.Default.Add,
+                    contentDescription = if (selectedTab == GalleryTab.PHOTOS) "Añadir foto" else "Añadir vídeo",
+                    onClick = { if (selectedTab == GalleryTab.PHOTOS) onAddPhotoRequested() else onAddVideoRequested() },
+                    modifier = Modifier.padding(start = 8.dp)
                 )
             }
         }
 
         when (selectedTab) {
-            GalleryTab.PHOTOS -> PhotoGrid(photos = photos)
-            GalleryTab.VIDEOS -> VideoLinkGrid(videoLinks = videoLinks)
+            GalleryTab.PHOTOS -> PhotoGrid(photos = photos, isAdmin = isAdmin, onDelete = onDeletePhoto)
+            GalleryTab.VIDEOS -> VideoLinkGrid(videoLinks = videoLinks, isAdmin = isAdmin, onDelete = onDeleteVideo)
         }
     }
 }
@@ -80,7 +98,7 @@ fun GallerySection(
  * listas de contenido acotadas, basta con repartirlas en filas normales.
  */
 @Composable
-private fun PhotoGrid(photos: List<GalleryPhoto>) {
+private fun PhotoGrid(photos: List<GalleryPhoto>, isAdmin: Boolean, onDelete: (String) -> Unit) {
     if (photos.isEmpty()) {
         EmptyGalleryMessage("Todavía no se han añadido fotos a la galería.")
         return
@@ -95,13 +113,23 @@ private fun PhotoGrid(photos: List<GalleryPhoto>) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 rowPhotos.forEach { photo ->
                     Column(modifier = Modifier.weight(1f)) {
-                        RemoteOrPlaceholderImage(
-                            imageUrl = photo.imageUrl,
-                            contentDescription = photo.caption,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .aspectRatio(1f)
-                        )
+                        Box(modifier = Modifier.fillMaxWidth()) {
+                            RemoteOrPlaceholderImage(
+                                imageUrl = photo.imageUrl,
+                                contentDescription = photo.caption,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .aspectRatio(1f)
+                            )
+                            if (isAdmin) {
+                                TranslucentIconButton(
+                                    icon = Icons.Default.Remove,
+                                    contentDescription = "Eliminar foto",
+                                    onClick = { onDelete(photo.id) },
+                                    modifier = Modifier.align(Alignment.TopEnd).padding(4.dp)
+                                )
+                            }
+                        }
                         Text(
                             text = photo.caption,
                             style = MaterialTheme.typography.bodyMedium,
@@ -123,7 +151,7 @@ private fun PhotoGrid(photos: List<GalleryPhoto>) {
  * publicación de Instagram/Facebook donde está subido el vídeo.
  */
 @Composable
-private fun VideoLinkGrid(videoLinks: List<GalleryVideoLink>) {
+private fun VideoLinkGrid(videoLinks: List<GalleryVideoLink>, isAdmin: Boolean, onDelete: (String) -> Unit) {
     if (videoLinks.isEmpty()) {
         EmptyGalleryMessage("Todavía no se han añadido vídeos a la galería.")
         return
@@ -164,6 +192,14 @@ private fun VideoLinkGrid(videoLinks: List<GalleryVideoLink>) {
                                     .align(Alignment.Center)
                                     .padding(8.dp)
                             )
+                            if (isAdmin) {
+                                TranslucentIconButton(
+                                    icon = Icons.Default.Remove,
+                                    contentDescription = "Eliminar vídeo",
+                                    onClick = { onDelete(link.id) },
+                                    modifier = Modifier.align(Alignment.TopEnd).padding(4.dp)
+                                )
+                            }
                         }
                         Text(
                             text = link.caption,
