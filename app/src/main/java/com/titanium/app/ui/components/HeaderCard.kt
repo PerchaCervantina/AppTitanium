@@ -1,6 +1,8 @@
 package com.titanium.app.ui.components
 
+import android.content.Intent
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -23,10 +25,13 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import com.titanium.app.R
 import com.titanium.app.data.firebase.PresentationInfo
+import java.net.URLEncoder
 
 /**
  * [onAdminAccessRequested] se dispara al mantener pulsado el logo de la
@@ -42,6 +47,8 @@ fun HeaderCard(
     modifier: Modifier = Modifier,
     onLogoPositioned: (Rect) -> Unit = {}
 ) {
+    val context = LocalContext.current
+
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -72,7 +79,13 @@ fun HeaderCard(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
-                modifier = Modifier.padding(top = 14.dp)
+                modifier = Modifier
+                    .padding(top = 14.dp)
+                    .clickable(enabled = presentation.location.isNotBlank()) {
+                        val query = URLEncoder.encode(presentation.location, "UTF-8")
+                        val uri = "https://www.google.com/maps/search/?api=1&query=$query".toUri()
+                        context.startActivity(Intent(Intent.ACTION_VIEW, uri))
+                    }
             ) {
                 Icon(
                     imageVector = Icons.Default.LocationOn,

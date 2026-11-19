@@ -102,27 +102,26 @@ fun EventCard(event: EventEntry, modifier: Modifier = Modifier) {
                         )
                     }
 
-                    Column(modifier = Modifier.padding(top = 16.dp, bottom = if (hasLogo) 12.dp else 0.dp)) {
-                        Text(
-                            text = event.musicDescription,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                    Text(
+                        text = event.musicDescription,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(top = 16.dp)
+                    )
 
-                        if (!event.socialUrl.isNullOrBlank()) {
-                            TextButton(
-                                onClick = {
-                                    val intent = android.content.Intent(
-                                        android.content.Intent.ACTION_VIEW,
-                                        event.socialUrl.toUri()
-                                    )
-                                    context.startActivity(intent)
-                                },
-                                modifier = Modifier.padding(top = 4.dp)
-                            ) {
-                                Icon(imageVector = Icons.Default.Link, contentDescription = null)
-                                Text(text = " Redes sociales del grupo")
-                            }
+                    if (!event.socialUrl.isNullOrBlank()) {
+                        TextButton(
+                            onClick = {
+                                val intent = android.content.Intent(
+                                    android.content.Intent.ACTION_VIEW,
+                                    event.socialUrl.toUri()
+                                )
+                                context.startActivity(intent)
+                            },
+                            modifier = Modifier.align(Alignment.BottomStart)
+                        ) {
+                            Icon(imageVector = Icons.Default.Link, contentDescription = null)
+                            Text(text = " Redes sociales del grupo")
                         }
                     }
                 }

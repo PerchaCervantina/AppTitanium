@@ -42,6 +42,9 @@ fun PresentationAdminScreen(
     var location by remember { mutableStateOf("") }
     var membershipIntro by remember { mutableStateOf("") }
     var instagramUrl by remember { mutableStateOf("") }
+    var facebookUrl by remember { mutableStateOf("") }
+    var tiktokUrl by remember { mutableStateOf("") }
+    var contactEmail by remember { mutableStateOf("") }
     var initialized by remember { mutableStateOf(false) }
 
     // Solo rellenamos los campos una vez con lo que haya en Firestore, para
@@ -53,6 +56,9 @@ fun PresentationAdminScreen(
             location = presentation.location
             membershipIntro = membership.intro
             instagramUrl = membership.instagramUrl
+            facebookUrl = membership.facebookUrl
+            tiktokUrl = membership.tiktokUrl
+            contactEmail = membership.email
             initialized = true
         }
     }
@@ -85,6 +91,7 @@ fun PresentationAdminScreen(
                 value = location,
                 onValueChange = { location = it },
                 label = { Text("Localización") },
+                supportingText = { Text("Se usa tal cual para abrir Google Maps: escribe la dirección real de la sede.") },
                 modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
             )
             OutlinedButton(
@@ -94,7 +101,13 @@ fun PresentationAdminScreen(
 
             HorizontalDivider()
 
-            Text(text = "Hazte socio (Instagram)", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 16.dp))
+            Text(text = "Hazte socio", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 16.dp))
+            Text(
+                text = "Deja vacío cualquiera de estos campos para que su botón no aparezca en la app.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 4.dp)
+            )
             OutlinedTextField(
                 value = membershipIntro,
                 onValueChange = { membershipIntro = it },
@@ -107,10 +120,30 @@ fun PresentationAdminScreen(
                 label = { Text("Enlace de Instagram (perfil o chat)") },
                 modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
             )
+            OutlinedTextField(
+                value = facebookUrl,
+                onValueChange = { facebookUrl = it },
+                label = { Text("Enlace de Facebook") },
+                modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+            )
+            OutlinedTextField(
+                value = tiktokUrl,
+                onValueChange = { tiktokUrl = it },
+                label = { Text("Enlace de TikTok") },
+                modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+            )
+            OutlinedTextField(
+                value = contactEmail,
+                onValueChange = { contactEmail = it },
+                label = { Text("Correo electrónico de contacto") },
+                modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+            )
             OutlinedButton(
                 onClick = {
                     scope.launch {
-                        repository.updateMembership(MembershipInfo(membershipIntro, instagramUrl))
+                        repository.updateMembership(
+                            MembershipInfo(membershipIntro, instagramUrl, facebookUrl, tiktokUrl, contactEmail)
+                        )
                     }
                 },
                 modifier = Modifier.padding(top = 12.dp)

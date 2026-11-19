@@ -20,9 +20,12 @@ data class PresentationInfo(
 
 data class MembershipInfo(
     val intro: String = "",
-    // Enlace al perfil o al chat de Instagram de la asociación, ej.
-    // "https://instagram.com/asociaciontitanium" o un enlace directo al DM.
-    val instagramUrl: String = ""
+    // Enlaces a redes sociales y contacto. Cada botón del "Hazte socio"
+    // solo aparece si su campo correspondiente no está vacío.
+    val instagramUrl: String = "",
+    val facebookUrl: String = "",
+    val tiktokUrl: String = "",
+    val email: String = ""
 )
 
 data class EventEntry(

@@ -48,7 +48,10 @@ class FirestoreContentRepository(
                 trySend(
                     MembershipInfo(
                         intro = snapshot?.getString("intro") ?: "",
-                        instagramUrl = snapshot?.getString("instagramUrl") ?: ""
+                        instagramUrl = snapshot?.getString("instagramUrl") ?: "",
+                        facebookUrl = snapshot?.getString("facebookUrl") ?: "",
+                        tiktokUrl = snapshot?.getString("tiktokUrl") ?: "",
+                        email = snapshot?.getString("email") ?: ""
                     )
                 )
             }
@@ -60,7 +63,10 @@ class FirestoreContentRepository(
             .set(
                 mapOf(
                     "intro" to info.intro,
-                    "instagramUrl" to info.instagramUrl
+                    "instagramUrl" to info.instagramUrl,
+                    "facebookUrl" to info.facebookUrl,
+                    "tiktokUrl" to info.tiktokUrl,
+                    "email" to info.email
                 )
             )
             .await()
