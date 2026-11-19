@@ -28,7 +28,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import com.titanium.app.data.firebase.EventBand
 import com.titanium.app.data.firebase.EventEntry
 
 @Composable
@@ -47,7 +46,7 @@ fun EventCard(event: EventEntry, modifier: Modifier = Modifier) {
                 DateBadge(day = event.day, month = event.month)
 
                 Text(
-                    text = event.bands.joinToString(" · ") { it.name },
+                    text = event.bandNames.joinToString(" · "),
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier
@@ -63,34 +62,19 @@ fun EventCard(event: EventEntry, modifier: Modifier = Modifier) {
             }
 
             AnimatedVisibility(visible = expanded, enter = expandVertically(), exit = shrinkVertically()) {
-                Column(modifier = Modifier.padding(top = 16.dp)) {
-                    event.bands.forEachIndexed { index, band ->
-                        BandPoster(band = band, modifier = Modifier.padding(top = if (index == 0) 0.dp else 20.dp))
-                    }
-                }
+                // El cartel se muestra completo y opaco (sin fundirse con el
+                // fondo ni recortarse): es el cartel real del concierto,
+                // compartido por todos los grupos de ese día.
+                RemoteOrPlaceholderImage(
+                    imageUrl = event.posterImageUrl,
+                    contentDescription = "Cartel del evento",
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier
+                        .padding(top = 16.dp)
+                        .fillMaxWidth()
+                )
             }
         }
-    }
-}
-
-@Composable
-private fun BandPoster(band: EventBand, modifier: Modifier = Modifier) {
-    Column(modifier = modifier) {
-        Text(
-            text = band.name,
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-        // El cartel se muestra completo y opaco (sin fundirse con el fondo
-        // ni recortarse): es el cartel real del concierto, no un logo.
-        RemoteOrPlaceholderImage(
-            imageUrl = band.posterImageUrl,
-            contentDescription = "Cartel de ${band.name}",
-            contentScale = ContentScale.Fit,
-            modifier = Modifier
-                .padding(top = 8.dp)
-                .fillMaxWidth()
-        )
     }
 }
 
