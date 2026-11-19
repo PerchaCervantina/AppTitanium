@@ -1,6 +1,7 @@
 package com.titanium.app.ui.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Image
@@ -45,7 +46,14 @@ fun RemoteOrPlaceholderImage(
 ) {
     if (imageUrl.isNullOrBlank()) {
         androidx.compose.foundation.layout.Box(
-            modifier = modifier.clip(MaterialTheme.shapes.medium),
+            // heightIn(min = ...) por si el modifier del sitio donde se usa
+            // no fija ninguna altura (p. ej. carteles de evento, que se
+            // dimensionan solos según la imagen real una vez subida): sin
+            // esto, el icono "sin imagen" quedaría con alto 0 y sería invisible.
+            modifier = Modifier
+                .heightIn(min = 160.dp)
+                .then(modifier)
+                .clip(MaterialTheme.shapes.medium),
             contentAlignment = Alignment.Center
         ) {
             Icon(

@@ -3,26 +3,22 @@ package com.titanium.app.ui.components
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
-import androidx.compose.material.icons.filled.Link
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,18 +26,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
+import com.titanium.app.data.firebase.EventBand
 import com.titanium.app.data.firebase.EventEntry
 
 @Composable
 fun EventCard(event: EventEntry, modifier: Modifier = Modifier) {
     var expanded by remember { mutableStateOf(false) }
-    val context = LocalContext.current
 
     Card(
         modifier = modifier
@@ -55,7 +47,7 @@ fun EventCard(event: EventEntry, modifier: Modifier = Modifier) {
                 DateBadge(day = event.day, month = event.month)
 
                 Text(
-                    text = event.bandName,
+                    text = event.bands.joinToString(" · ") { it.name },
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier
@@ -71,62 +63,34 @@ fun EventCard(event: EventEntry, modifier: Modifier = Modifier) {
             }
 
             AnimatedVisibility(visible = expanded, enter = expandVertically(), exit = shrinkVertically()) {
-                val surfaceColor = MaterialTheme.colorScheme.surface
-                val hasLogo = !event.logoImageUrl.isNullOrBlank()
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = if (hasLogo) 170.dp else 0.dp)
-                ) {
-                    if (hasLogo) {
-                        // El logo hace de fondo del desplegable, difuminado hacia el
-                        // color de la tarjeta para que se "funda" con ella en vez de
-                        // verse como una foto recortada aparte.
-                        RemoteOrPlaceholderImage(
-                            imageUrl = event.logoImageUrl,
-                            contentDescription = "Logo de ${event.bandName}",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .matchParentSize()
-                                .alpha(0.35f)
-                        )
-                        Box(
-                            modifier = Modifier
-                                .matchParentSize()
-                                .background(
-                                    Brush.verticalGradient(
-                                        colors = listOf(surfaceColor.copy(alpha = 0.2f), surfaceColor)
-                                    )
-                                )
-                        )
-                    }
-
-                    Text(
-                        text = event.musicDescription,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(top = 16.dp)
-                    )
-
-                    if (!event.socialUrl.isNullOrBlank()) {
-                        TextButton(
-                            onClick = {
-                                val intent = android.content.Intent(
-                                    android.content.Intent.ACTION_VIEW,
-                                    event.socialUrl.toUri()
-                                )
-                                context.startActivity(intent)
-                            },
-                            modifier = Modifier.align(Alignment.BottomStart)
-                        ) {
-                            Icon(imageVector = Icons.Default.Link, contentDescription = null)
-                            Text(text = " Redes sociales del grupo")
-                        }
+                Column(modifier = Modifier.padding(top = 16.dp)) {
+                    event.bands.forEachIndexed { index, band ->
+                        BandPoster(band = band, modifier = Modifier.padding(top = if (index == 0) 0.dp else 20.dp))
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun BandPoster(band: EventBand, modifier: Modifier = Modifier) {
+    Column(modifier = modifier) {
+        Text(
+            text = band.name,
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        // El cartel se muestra completo y opaco (sin fundirse con el fondo
+        // ni recortarse): es el cartel real del concierto, no un logo.
+        RemoteOrPlaceholderImage(
+            imageUrl = band.posterImageUrl,
+            contentDescription = "Cartel de ${band.name}",
+            contentScale = ContentScale.Fit,
+            modifier = Modifier
+                .padding(top = 8.dp)
+                .fillMaxWidth()
+        )
     }
 }
 

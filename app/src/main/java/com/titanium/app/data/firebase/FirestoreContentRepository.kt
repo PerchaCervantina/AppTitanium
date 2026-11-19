@@ -166,16 +166,8 @@ class FirestoreContentRepository(
     }
 }
 
-private fun com.google.firebase.firestore.DocumentSnapshot.toEvent() = EventEntry(
-    id = id,
-    day = getString("day") ?: "",
-    month = getString("month") ?: "",
-    bandName = getString("bandName") ?: "",
-    musicDescription = getString("musicDescription") ?: "",
-    logoImageUrl = getString("logoImageUrl"),
-    socialUrl = getString("socialUrl"),
-    createdAt = getLong("createdAt") ?: 0L
-)
+private fun com.google.firebase.firestore.DocumentSnapshot.toEvent(): EventEntry =
+    (toObject(EventEntry::class.java) ?: EventEntry()).copy(id = id)
 
 private fun com.google.firebase.firestore.DocumentSnapshot.toVenuePhoto() = VenuePhoto(
     id = id,

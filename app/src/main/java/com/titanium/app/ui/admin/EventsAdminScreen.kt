@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -25,7 +26,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.material3.ExperimentalMaterial3Api
+import com.titanium.app.data.firebase.EventBand
 import com.titanium.app.data.firebase.EventEntry
 import com.titanium.app.data.firebase.FirestoreContentRepository
 import kotlinx.coroutines.launch
@@ -37,35 +38,137 @@ fun EventsAdminScreen(
     onBack: () -> Unit
 ) {
     val events by repository.observeEvents().collectAsState(initial = emptyList())
-    var editing by remember { mutableStateOf(EventEntry()) }
+
+    var editingId by remember { mutableStateOf("") }
+    var day by remember { mutableStateOf("") }
+    var month by remember { mutableStateOf("") }
+    var bands by remember { mutableStateOf(listOf<EventBand>()) }
+    var newBandName by remember { mutableStateOf("") }
+    var newBandPosterUrl by remember { mutableStateOf<String?>(null) }
+
+    fun resetForm() {
+        editingId = ""
+        day = ""
+        month = ""
+        bands = emptyList()
+        newBandName = ""
+        newBandPosterUrl = null
+    }
+
     val scope = rememberCoroutineScope()
 
     Column(modifier = Modifier.fillMaxSize()) {
         TopAppBar(title = { Text("Próximos eventos") })
 
         LazyColumn(modifier = Modifier.weight(1f).padding(horizontal = 16.dp)) {
-            item { EventForm(editing, onChange = { editing = it }) }
             item {
-                Row(modifier = Modifier.padding(vertical = 12.dp)) {
-                    OutlinedButton(onClick = {
-                        val toSave = editing
-                        scope.launch {
-                            repository.addOrUpdateEvent(toSave)
-                            editing = EventEntry()
+                Column(modifier = Modifier.padding(top = 12.dp)) {
+                    Text(
+                        text = if (editingId.isBlank()) "Nuevo evento" else "Editando evento",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(top = 8.dp)) {
+                        OutlinedTextField(
+                            value = day,
+                            onValueChange = { day = it },
+                            label = { Text("Día") },
+                            modifier = Modifier.weight(1f)
+                        )
+                        OutlinedTextField(
+                            value = month,
+                            onValueChange = { month = it },
+                            label = { Text("Mes") },
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+
+                    Text(
+                        text = "Grupos de este día",
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(top = 16.dp)
+                    )
+                    if (bands.isEmpty()) {
+                        Text(
+                            text = "Todavía no has añadido ningún grupo a este evento.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    }
+                    bands.forEachIndexed { index, band ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+                        ) {
+                            Text(
+                                text = band.name,
+                                style = MaterialTheme.typography.bodyLarge,
+                                modifier = Modifier.weight(1f)
+                            )
+                            TextButton(onClick = { bands = bands.toMutableList().apply { removeAt(index) } }) {
+                                Text("Quitar")
+                            }
                         }
-                    }) {
-                        Text(if (editing.id.isBlank()) "Añadir evento" else "Guardar cambios")
                     }
-                    if (editing.id.isNotBlank()) {
-                        TextButton(onClick = { editing = EventEntry() }) { Text("Cancelar edición") }
+
+                    Text(
+                        text = "Añadir grupo",
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(top = 16.dp)
+                    )
+                    OutlinedTextField(
+                        value = newBandName,
+                        onValueChange = { newBandName = it },
+                        label = { Text("Nombre del grupo") },
+                        modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+                    )
+                    ImageUploadField(
+                        folder = "events",
+                        label = "Cartel del concierto",
+                        imageUrl = newBandPosterUrl,
+                        onUploaded = { newBandPosterUrl = it }
+                    )
+                    OutlinedButton(
+                        enabled = newBandName.isNotBlank(),
+                        onClick = {
+                            bands = bands + EventBand(name = newBandName, posterImageUrl = newBandPosterUrl)
+                            newBandName = ""
+                            newBandPosterUrl = null
+                        },
+                        modifier = Modifier.padding(top = 8.dp)
+                    ) { Text("Añadir grupo a este evento") }
+
+                    Row(modifier = Modifier.padding(top = 20.dp, bottom = 12.dp)) {
+                        OutlinedButton(
+                            enabled = day.isNotBlank() && month.isNotBlank() && bands.isNotEmpty(),
+                            onClick = {
+                                val entry = EventEntry(id = editingId, day = day, month = month, bands = bands)
+                                scope.launch {
+                                    repository.addOrUpdateEvent(entry)
+                                    resetForm()
+                                }
+                            }
+                        ) {
+                            Text(if (editingId.isBlank()) "Añadir evento" else "Guardar cambios")
+                        }
+                        if (editingId.isNotBlank()) {
+                            TextButton(onClick = { resetForm() }) { Text("Cancelar edición") }
+                        }
                     }
+                    HorizontalDivider()
                 }
             }
-            item { HorizontalDivider() }
-            items(events) { event ->
+
+            items(events, key = { it.id }) { event ->
                 EventRow(
                     event = event,
-                    onEdit = { editing = event },
+                    onEdit = {
+                        editingId = event.id
+                        day = event.day
+                        month = event.month
+                        bands = event.bands
+                        newBandName = ""
+                        newBandPosterUrl = null
+                    },
                     onDelete = { scope.launch { repository.deleteEvent(event.id) } }
                 )
             }
@@ -76,58 +179,12 @@ fun EventsAdminScreen(
 }
 
 @Composable
-private fun EventForm(event: EventEntry, onChange: (EventEntry) -> Unit) {
-    Column(modifier = Modifier.padding(top = 12.dp)) {
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            OutlinedTextField(
-                value = event.day,
-                onValueChange = { onChange(event.copy(day = it)) },
-                label = { Text("Día") },
-                modifier = Modifier.weight(1f)
-            )
-            OutlinedTextField(
-                value = event.month,
-                onValueChange = { onChange(event.copy(month = it)) },
-                label = { Text("Mes") },
-                modifier = Modifier.weight(1f)
-            )
-        }
-        OutlinedTextField(
-            value = event.bandName,
-            onValueChange = { onChange(event.copy(bandName = it)) },
-            label = { Text("Nombre del grupo") },
-            modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
-        )
-        OutlinedTextField(
-            value = event.musicDescription,
-            onValueChange = { onChange(event.copy(musicDescription = it)) },
-            label = { Text("Descripción de su música") },
-            modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
-        )
-        OutlinedTextField(
-            value = event.socialUrl.orEmpty(),
-            onValueChange = { onChange(event.copy(socialUrl = it)) },
-            label = { Text("Enlace a redes sociales (opcional)") },
-            modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
-        )
-        ImageUploadField(
-            folder = "events",
-            label = "Logo del grupo",
-            imageUrl = event.logoImageUrl,
-            onUploaded = { url -> onChange(event.copy(logoImageUrl = url)) }
-        )
-    }
-}
-
-@Composable
 private fun EventRow(event: EventEntry, onEdit: () -> Unit, onDelete: () -> Unit) {
     Card(modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp)) {
         Column(modifier = Modifier.padding(12.dp)) {
-            Text(text = "${event.day} ${event.month} — ${event.bandName}", style = MaterialTheme.typography.titleMedium)
             Text(
-                text = event.musicDescription,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                text = "${event.day} ${event.month} — ${event.bands.joinToString(", ") { it.name }}",
+                style = MaterialTheme.typography.titleMedium
             )
             Row(modifier = Modifier.padding(top = 8.dp)) {
                 OutlinedButton(onClick = onEdit) { Text("Editar") }

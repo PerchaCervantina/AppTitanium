@@ -28,14 +28,21 @@ data class MembershipInfo(
     val email: String = ""
 )
 
+/**
+ * Un evento es una fecha con uno o varios grupos actuando ese día. Cada
+ * grupo lleva solo su nombre y el cartel (el cartel del concierto, no un
+ * logo): no hay descripción ni enlace por grupo.
+ */
+data class EventBand(
+    val name: String = "",
+    val posterImageUrl: String? = null
+)
+
 data class EventEntry(
     val id: String = "",
     val day: String = "",
     val month: String = "",
-    val bandName: String = "",
-    val musicDescription: String = "",
-    val logoImageUrl: String? = null,
-    val socialUrl: String? = null,
+    val bands: List<EventBand> = emptyList(),
     val createdAt: Long = 0L
 )
 

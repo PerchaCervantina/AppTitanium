@@ -29,7 +29,7 @@ Dentro del panel de administración, pulsa **"Gestionar administradores"** (solo
 
 Desde el panel de administración:
 
-- **Próximos eventos**: rellena fecha, grupo, descripción musical, logo (se elige una foto del móvil y se sube sola) y, si quieres, el enlace a sus redes. Para editar uno ya creado, pulsa "Editar" en su tarjeta, cambia lo que quieras y pulsa "Guardar cambios".
+- **Próximos eventos**: un evento es una fecha (día y mes) con uno o varios grupos actuando ese día. Primero pones el día y el mes, luego vas añadiendo los grupos uno a uno (nombre + el cartel del concierto, se elige una foto del móvil y se sube sola) con "Añadir grupo a este evento", y cuando los tengas todos, pulsas "Añadir evento" para guardarlo. Para editar un evento ya creado, pulsa "Editar" en su tarjeta: carga sus grupos para que puedas quitar alguno o añadir más, y pulsa "Guardar cambios".
 - **Nuestra sede**: añade una foto del local con un texto. Para quitar una, pulsa "Eliminar" en su tarjeta.
 - **Galería → Fotos**: igual que la sede, foto + texto.
 - **Galería → Vídeos (enlace)**: aquí **no se sube el vídeo**, solo se pega el enlace a la publicación ya subida al Instagram o Facebook de la asociación, con un texto y, opcionalmente, una miniatura. Al tocarlo en la app, se abre ese enlace. Esto es así para no generar coste de almacenamiento/ancho de banda por los vídeos.
