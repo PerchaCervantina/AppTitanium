@@ -9,30 +9,50 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 
+private enum class GateStep { AUTH, NOT_AUTHORIZED, DASHBOARD }
+
 /**
- * Diálogo de acceso de administrador (login o "no autorizada"), por
- * encima de la pantalla principal, que nunca se desmonta mientras tanto
- * (así el vídeo de intro no se repite al entrar/salir de aquí).
- * Se cierra solo en cuanto la sesión pasa a ser de administrador.
+ * Diálogo de acceso de administrador, por encima de la pantalla
+ * principal (que nunca se desmonta mientras tanto, así el vídeo de intro
+ * no se repite). Pasa por login → panel de administración (con "ir a la
+ * app", gestionar administradores y cerrar sesión) → solo se cierra
+ * cuando la persona pulsa explícitamente "ir a la app" o cierra sesión.
  */
 @Composable
-fun AdminGateDialog(session: AdminSession, onDismiss: () -> Unit) {
-    LaunchedEffect(session.isAdmin) {
-        if (session.isAdmin) onDismiss()
+fun AdminGateDialog(session: AdminSession, onDismiss: () -> Unit, onManageAdminsRequested: () -> Unit) {
+    var step by remember(session.isLoggedIn, session.isAdmin) {
+        mutableStateOf(
+            when {
+                !session.isLoggedIn -> GateStep.AUTH
+                !session.isAdmin -> GateStep.NOT_AUTHORIZED
+                else -> GateStep.DASHBOARD
+            }
+        )
     }
 
     Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-            if (!session.isLoggedIn) {
-                AdminAuthScreen(session = session, onBack = onDismiss)
-            } else {
-                NotAuthorizedContent(session = session, onExit = onDismiss)
+            when (step) {
+                GateStep.AUTH -> AdminAuthScreen(session = session, onBack = onDismiss)
+                GateStep.NOT_AUTHORIZED -> NotAuthorizedContent(session = session, onExit = onDismiss)
+                GateStep.DASHBOARD -> AdminDashboardScreen(
+                    session = session,
+                    onEnterEditMode = onDismiss,
+                    onManageAdminsRequested = onManageAdminsRequested,
+                    onLogout = {
+                        session.signOut()
+                        onDismiss()
+                    }
+                )
             }
         }
     }

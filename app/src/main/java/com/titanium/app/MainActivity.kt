@@ -54,7 +54,11 @@ private fun TitaniumApp() {
     )
 
     if (showAuthDialog) {
-        AdminGateDialog(session = session, onDismiss = { showAuthDialog = false })
+        AdminGateDialog(
+            session = session,
+            onDismiss = { showAuthDialog = false },
+            onManageAdminsRequested = { showManageAdmins = true }
+        )
     }
 
     if (showManageAdmins) {
