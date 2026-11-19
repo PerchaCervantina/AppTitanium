@@ -29,11 +29,11 @@ Dentro del panel de administración, pulsa **"Gestionar administradores"** (solo
 
 Desde el panel de administración:
 
-- **Próximos eventos**: un evento es una fecha (día y mes) con uno o varios grupos actuando ese día. Primero pones el día y el mes, luego vas añadiendo los grupos uno a uno (nombre + el cartel del concierto, se elige una foto del móvil y se sube sola) con "Añadir grupo a este evento", y cuando los tengas todos, pulsas "Añadir evento" para guardarlo. Para editar un evento ya creado, pulsa "Editar" en su tarjeta: carga sus grupos para que puedas quitar alguno o añadir más, y pulsa "Guardar cambios".
-- **Nuestra sede**: añade una foto del local con un texto. Para quitar una, pulsa "Eliminar" en su tarjeta.
-- **Galería → Fotos**: igual que la sede, foto + texto.
-- **Galería → Vídeos (enlace)**: aquí **no se sube el vídeo**, solo se pega el enlace a la publicación ya subida al Instagram o Facebook de la asociación, con un texto y, opcionalmente, una miniatura. Al tocarlo en la app, se abre ese enlace. Esto es así para no generar coste de almacenamiento/ancho de banda por los vídeos.
-- **Presentación y contacto**: aquí se cambia el nombre, el texto de presentación, la localización, el texto de "Hazte socio" y el enlace de Instagram del botón "Escríbenos en Instagram".
+- **Próximos eventos**: pulsa el **+** junto al título para crear uno nuevo (o el lápiz sobre un evento ya creado para editarlo). Toca la fecha para elegirla con el calendario (coloca sola el día y el mes abreviado). Añade uno o varios **grupos** por su nombre — cada uno aparece junto a un botón "Quitar" para comprobar que está bien escrito. Hay **un único cartel** para todo el evento (vale para todos los grupos de ese día): tócalo para elegir o cambiar la imagen. Termina con "Añadir evento"/"Guardar cambios". Para borrar un evento, entra en editarlo y pulsa "Eliminar evento".
+- **Nuestra sede**: pulsa el **+** junto al título para añadir una foto con su texto. Cada foto tiene un icono **−** en su esquina para eliminarla.
+- **Galería → Fotos**: igual que la sede, **+** para añadir (foto + texto), **−** sobre cada una para quitarla.
+- **Galería → Vídeos (enlace)**: aquí **no se sube el vídeo**, solo se pega (con el **+**) el enlace a la publicación ya subida al Instagram o Facebook de la asociación, con un texto y, opcionalmente, una miniatura. Al tocarlo en la app, se abre ese enlace. Esto es así para no generar coste de almacenamiento/ancho de banda por los vídeos.
+- **Presentación y contacto**: aquí se cambia el texto de presentación, la localización y, en "Hazte socio", el texto de invitación y los enlaces de Instagram/Facebook/TikTok/correo (cada botón solo aparece en la app si rellenas su campo).
 
 Todo se guarda al momento: en cuanto pulsas "Añadir"/"Guardar", ya lo ve cualquiera que abra la app (no hace falta volver a instalar nada).
 
