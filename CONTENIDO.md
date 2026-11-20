@@ -40,6 +40,10 @@ Todo se hace directamente sobre la pantalla principal, con sesión iniciada:
 
 Todo se guarda al momento: en cuanto pulsas "Añadir"/"Guardar", ya lo ve cualquiera que abra la app (no hace falta volver a instalar nada).
 
+## Ver una foto más grande
+
+Al tocar el cartel de un evento (una vez desplegado), una foto de "Nuestra sede" o una foto de "Galería → Fotos", se abre a pantalla completa y centrada, y se puede hacer zoom/mover con los dedos. Para volver a la vista normal, toca fuera de la imagen o el icono de cerrar de la esquina. Esto no aplica a los vídeos de la galería (esos siguen abriendo el enlace de Instagram/Facebook al tocarlos).
+
 ## El vídeo de introducción
 
 Ese es el único contenido que sigue sin gestionarse desde el panel: el vídeo que se ve al abrir la app (antes de las tarjetas) sigue viniendo incluido dentro de la propia app, en `app/src/main/assets/videos/intro.mp4`, porque así no genera ningún coste de ancho de banda (se descarga una sola vez, al instalar la app). Para cambiarlo hay que sustituir ese fichero y volver a generar la app.

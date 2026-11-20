@@ -54,6 +54,7 @@ fun GallerySection(
     onDeleteVideo: (String) -> Unit = {}
 ) {
     var selectedTab by remember { mutableStateOf(GalleryTab.PHOTOS) }
+    var zoomedImageUrl by remember { mutableStateOf<String?>(null) }
 
     Column(modifier = modifier) {
         SectionTitle(text = "Galería")
@@ -84,9 +85,22 @@ fun GallerySection(
         }
 
         when (selectedTab) {
-            GalleryTab.PHOTOS -> PhotoGrid(photos = photos, isAdmin = isAdmin, onDelete = onDeletePhoto)
+            GalleryTab.PHOTOS -> PhotoGrid(
+                photos = photos,
+                isAdmin = isAdmin,
+                onDelete = onDeletePhoto,
+                onPhotoTapped = { zoomedImageUrl = it }
+            )
             GalleryTab.VIDEOS -> VideoLinkGrid(videoLinks = videoLinks, isAdmin = isAdmin, onDelete = onDeleteVideo)
         }
+    }
+
+    zoomedImageUrl?.let { url ->
+        ZoomableImageOverlay(
+            imageUrl = url,
+            contentDescription = "Foto de la galería",
+            onDismiss = { zoomedImageUrl = null }
+        )
     }
 }
 
@@ -98,7 +112,12 @@ fun GallerySection(
  * listas de contenido acotadas, basta con repartirlas en filas normales.
  */
 @Composable
-private fun PhotoGrid(photos: List<GalleryPhoto>, isAdmin: Boolean, onDelete: (String) -> Unit) {
+private fun PhotoGrid(
+    photos: List<GalleryPhoto>,
+    isAdmin: Boolean,
+    onDelete: (String) -> Unit,
+    onPhotoTapped: (String) -> Unit
+) {
     if (photos.isEmpty()) {
         EmptyGalleryMessage("Todavía no se han añadido fotos a la galería.")
         return
@@ -120,6 +139,7 @@ private fun PhotoGrid(photos: List<GalleryPhoto>, isAdmin: Boolean, onDelete: (S
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .aspectRatio(1f)
+                                    .clickable(enabled = photo.imageUrl.isNotBlank()) { onPhotoTapped(photo.imageUrl) }
                             )
                             if (isAdmin) {
                                 TranslucentIconButton(

@@ -74,6 +74,7 @@ fun EventCard(
     }
 
     var expanded by remember { mutableStateOf(false) }
+    var showZoomedPoster by remember { mutableStateOf(false) }
 
     Card(
         modifier = modifier
@@ -122,9 +123,18 @@ fun EventCard(
                     modifier = Modifier
                         .padding(top = 16.dp)
                         .fillMaxWidth()
+                        .clickable(enabled = !event.posterImageUrl.isNullOrBlank()) { showZoomedPoster = true }
                 )
             }
         }
+    }
+
+    if (showZoomedPoster) {
+        ZoomableImageOverlay(
+            imageUrl = event.posterImageUrl,
+            contentDescription = "Cartel del evento",
+            onDismiss = { showZoomedPoster = false }
+        )
     }
 }
 
